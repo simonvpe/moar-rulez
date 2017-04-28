@@ -7,6 +7,13 @@ Simply drop the `include/moar_rulez.hpp` file in your project and you're good to
 ## Example ##
 This example actually gets reduced down to a single assembler instruction if you compile it with gcc 7.0.1 and `-O3` optimization. That is indeed blazingly fast!
 ```c++
+#include <moar_rulez.hpp>
+using moar_rulez::make_rule;
+using moar_rulez::State;
+using moar_rulez::eq;
+using moar_rulez::set;
+using moar_rulez::execute;
+
 bool dude_can_open_the_door() {
   auto door_open     = false;
   auto door_locked   = true;
