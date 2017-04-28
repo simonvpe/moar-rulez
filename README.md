@@ -2,7 +2,9 @@
 Moar-rulez aims to be a very simple, very fast, yet very useful single header rules engine library. It uses operator everloads to allow chaining of rules with regular boolean operators and other helper functions.
 
 The implementation is basically modeled as a behavior tree implemented with constexpr functions so that the boilerplate and glue code can be moved out of runtime and into compile time. Speed, clean code and simplicity has been the focus for every line of code.
+
 ## Getting Started ##
+
 There are no dependencies but project has only been tested with gcc 7.0.1.
 ## Installing ##
 Simply drop the `include/moar_rulez.hpp` file in your project and you're good to go.
