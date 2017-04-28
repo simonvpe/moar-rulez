@@ -1,108 +1,97 @@
-// vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
 #pragma once
-
-#include <functional>
-#include <type_traits>
-#include <tuple>
 
 namespace moar_rulez {
   enum class State { Fail, Success, Running };
 
+  // Rule factory
+  
+  template<typename TExecute> struct Rule { TExecute execute; };
+
+  constexpr inline auto make_rule(auto f) {
+    return Rule<decltype(f)>{f};
+  }
+  
   // Logic operators
   
-  constexpr inline auto operator~(auto rule) {
-    return [rule]{
-      const auto result = rule();
+  constexpr inline auto operator~(Rule<auto> rule) {
+    return make_rule([rule]{
+      const auto result = rule.execute();
       return result == State::Fail ? State::Success :
-	result == State::Success ? State::Fail :
-	State::Running;
-    };
+             result == State::Success ? State::Fail :
+             State::Running;
+    });
   }
 
-  constexpr inline auto operator&&(auto left, auto right) {
-    return [left, right]{
-      const auto lresult = left();
-      const auto rresult = right();
-      return (lresult == State::Fail || rresult == State::Fail) ? State::Fail :
-	(lresult == State::Success && rresult == State::Success) ? State::Success :
-	State::Running;
-    };
+  constexpr inline auto operator&&(Rule<auto> left, Rule<auto> right) {
+    return make_rule([left, right]{
+      const auto lresult = left.execute();
+      if(lresult == State::Fail || lresult == State::Running) return lresult;
+      const auto rresult = right.execute();
+      if(rresult == State::Fail || rresult == State::Running) return rresult;
+      return State::Success;
+    });
   }
 
-  constexpr inline auto operator||(auto left, auto right) {
-    return [left, right]{
-      const auto lresult = left();
-      const auto rresult = right();
-      return (lresult == State::Success || rresult == State::Success) ? State::Success :
-	(lresult == State::Fail && rresult == State::Fail) ? State::Fail :
-	State::Running;
-    };
+  constexpr inline auto operator||(Rule<auto> left, Rule<auto> right) {
+    return make_rule([left, right]{
+      const auto lresult = left.execute();
+      if(lresult == State::Success || lresult == State::Running) return lresult;
+      const auto rresult = right.execute();
+      if(rresult == State::Success || rresult == State::Running) return rresult;
+      return State::Fail;
+    });
   }
 
   // Rule factories
   
   constexpr inline auto eq(const auto& ref, auto value) {
-    return [&ref,value]{
+    return make_rule([&ref,value]{
       return (value == ref) ? State::Success : State::Fail;
-    };
+    });
   }
 
   constexpr inline auto ne(const auto& ref, auto value) {
-    return [&ref,value]{
+    return make_rule([&ref,value]{
       return (value != ref) ? State::Success : State::Fail;
-    };
+    });
   }
 
   constexpr inline auto gt(const auto& ref, auto value) {
-    return [&ref,value]{
+    return make_rule([&ref,value]{
       return (value < ref) ? State::Success : State::Fail;
-    };
+    });
   }
 
   constexpr inline auto lt(const auto& ref, auto value) {
-    return [&ref,value]{
+    return make_rule([&ref,value]{
       return (value > ref) ? State::Success : State::Fail;
-    };
+    });
   }
 
-  constexpr inline auto sequence() {
-    return []{ return State::Success; };
-  }
+  // Manipulation of state
 
-  template <typename First, typename ... Rules>
-  constexpr inline auto sequence(First first, Rules ... rules) {
-    return [first, rules...](){
-      const auto rfirst = first();
-      if(rfirst == State::Fail || rfirst == State::Running) {
-	return rfirst;
-      }
-      return sequence(rules...)();
-    };
+  constexpr inline auto set(auto& ref, auto value) {
+    return make_rule([&ref,value]{
+	ref = value;
+	return State::Success;
+    });
   }
-
+  
   // Constant rules
   
-  static constexpr auto success = []{ return State::Success; };
-  static constexpr auto fail    = []{ return State::Fail;    };
-  static constexpr auto running = []{ return State::Running; };
+  static constexpr auto success = make_rule([]{ return State::Success; });
+  static constexpr auto fail    = make_rule([]{ return State::Fail;    });
+  static constexpr auto running = make_rule([]{ return State::Running; });
 
   // Convenience, makes less typing
   
-  constexpr inline bool operator==(decltype(success) lhs, State rhs) {
-    return lhs() == rhs;
-  }
-
-  constexpr inline bool operator==(decltype(fail) lhs, State rhs) {
-    return lhs() == rhs;
-  }
-
-  constexpr inline bool operator==(decltype(running) lhs, State rhs) {
-    return lhs() == rhs;
+  constexpr inline bool operator==(Rule<auto> lhs, State rhs) {
+    return lhs.execute() == rhs;
   }
 
   // Execution
   
-  inline State execute(auto rule) {
-    return rule();
+  inline State execute(Rule<auto> rule) {
+    return rule.execute();
   }
 } // namespace moar_rulez

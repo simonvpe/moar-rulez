@@ -12,7 +12,8 @@ using moar_rulez::ne;
 using moar_rulez::gt;
 using moar_rulez::lt;
 using moar_rulez::State;
-using moar_rulez::sequence;
+using moar_rulez::make_rule;
+using moar_rulez::set;
 
 SCENARIO("All rules should work independently") {
   
@@ -27,7 +28,7 @@ SCENARIO("All rules should work independently") {
     CHECK( fail    == execute(fail && success) );
     CHECK( fail    == execute(fail && fail) );
     CHECK( fail    == execute(fail && running) );
-    CHECK( fail    == execute(running && fail) );
+    CHECK( running == execute(running && fail) );
     CHECK( running == execute(success && running) );
     CHECK( running == execute(running && success) );
     CHECK( running == execute(running && running) );
@@ -37,7 +38,7 @@ SCENARIO("All rules should work independently") {
     CHECK( success == execute(success || fail) );
     CHECK( success == execute(fail || success) );
     CHECK( success == execute(success || running) );
-    CHECK( success == execute(running || success) );
+    CHECK( running == execute(running || success) );
     CHECK( fail    == execute(fail || fail) );
     CHECK( running == execute(fail || running) );
     CHECK( running == execute(running || fail) );
@@ -72,35 +73,6 @@ SCENARIO("All rules should work independently") {
     CHECK( fail    == execute(lt(ltvar,4)) );
     CHECK( success == execute(lt(ltvar,5)) );
     CHECK( fail    == execute(lt(ltvar,2)) );
-  }  
-  GIVEN("sequence") {
-    CHECK( success == execute(sequence(success, success, success)) );
-    CHECK( fail    == execute(sequence(success, success, fail)) );
-    CHECK( running == execute(sequence(success, success, running)) );
-    CHECK( fail    == execute(sequence(success, fail, success)) );
-    CHECK( fail    == execute(sequence(success, fail, fail)) );
-    CHECK( fail    == execute(sequence(success, fail, running)) );
-    CHECK( running == execute(sequence(success, running, success)) );
-    CHECK( running == execute(sequence(success, running, fail)) );
-    CHECK( running == execute(sequence(success, running, running)) );
-    CHECK( fail    == execute(sequence(fail, success, success)) );
-    CHECK( fail    == execute(sequence(fail, success, fail)) );
-    CHECK( fail    == execute(sequence(fail, success, running)) );
-    CHECK( fail    == execute(sequence(fail, fail, success)) );
-    CHECK( fail    == execute(sequence(fail, fail, fail)) );
-    CHECK( fail    == execute(sequence(fail, fail, running)) );
-    CHECK( fail    == execute(sequence(fail, running, success)) );
-    CHECK( fail    == execute(sequence(fail, running, fail)) );
-    CHECK( fail    == execute(sequence(fail, running, running)) );
-    CHECK( running == execute(sequence(running, success, success)) );
-    CHECK( running == execute(sequence(running, success, fail)) );
-    CHECK( running == execute(sequence(running, success, running)) );
-    CHECK( running == execute(sequence(running, fail, success)) );
-    CHECK( running == execute(sequence(running, fail, fail)) );
-    CHECK( running == execute(sequence(running, fail, running)) );
-    CHECK( running == execute(sequence(running, running, success)) );
-    CHECK( running == execute(sequence(running, running, fail)) );
-    CHECK( running == execute(sequence(running, running, running)) );
   }
 }
 
@@ -108,109 +80,51 @@ SCENARIO("Example: A dude tries to open a door") {
   // positions [ dude, door ]
   auto door_open     = false;
   auto door_locked   = true;
+  auto failed        = false;
+  auto dude_has_key  = true;
   auto dude_position = 0;
-  constexpr auto door_position = 1;
+  constexpr auto door_position = 100;
 
-  const auto move_dude = [&dude_position]{
+  const auto move_dude = make_rule([&]{
     dude_position += 1;
     return State::Success;
-  };
+  });
 
-  //success && move_dude && move_dude;
-}
-/*
-#include <iostream>
-enum class Door { Closed, Open };
-enum class Position { BeforeDoor, AtDoor, BehindDoor };
-Door door;
-Position position;
-bool walking;
-bool path_blocked;
-bool door_blocked;
-
-SCENARIO("A simple example: A character that wants to go through a door.") {
-
-  const auto walk_up_to_door = [&]{
-      if(position == Position::AtDoor) {
-	return State::Success;
-      }
-      if((position == Position::BeforeDoor) && !path_blocked) {
-	if(!walking) {
-	  walking = true;
-	  return State::Running;
-	} else {
-	  walking = false;
-	  position = Position::AtDoor;
-	  return State::Success;
-	}
-      }
-      return State::Fail;
-  };
-
-  const auto open_door = [&]{
-      if(door == Door::Open || !door_blocked) {
-	door = Door::Open;
-	return State::Success;
-      }
-      return State::Fail;
-  };
-
-  const auto close_door = [&]{
-      if(door == Door::Closed || !door_blocked) {
-	door = Door::Closed;
-	return State::Success;
-      }
-      return State::Fail;
-  };
-
-  const auto walk_away = [&]{
-      position = Position::BehindDoor;
+  const auto unlock_door = make_rule([&]{
+      if(dude_position != door_position || !dude_has_key) return State::Fail;
+      door_locked = false;
       return State::Success;
+  });
+
+  const auto open_door = make_rule([&]{
+      if(dude_position != door_position || door_locked) return State::Fail;
+      door_open = true;
+      return State::Success;
+  });
+
+  const auto try_open =
+    eq(dude_position, door_position)
+    && (unlock_door || set(failed,true))
+    && open_door;
+  
+  const auto rules =
+    try_open
+    || move_dude;
+
+  const auto run = [&]{
+    while( door_locked && !failed ) execute(rules);
   };
-
-  GIVEN("door is not blocked") {
-    door         = Door::Closed;
-    position     = Position::BeforeDoor;
-    walking      = false;
-    path_blocked = false;
-    door_blocked = false;
   
-    const auto r = sequence(
-        walk_up_to_door,
-	open_door,
-	close_door,
-	walk_away
-    );
-  
-    CHECK( State::Running == execute(r) );
-    CHECK( State::Success == execute(r) );
-  
-    CHECK( position == Position::BehindDoor );
-    CHECK( door == Door::Closed );
-    CHECK( walking == false );
+  GIVEN("the dude has no key") {
+    dude_has_key = false;
+    run();
+    CHECK( false == door_open );
+    CHECK( true  == failed );
   }
-
-  GIVEN("door is blocked") {
-    door         = Door::Closed;
-    position     = Position::BeforeDoor;
-    walking      = false;
-    path_blocked = false;
-    door_blocked = true;
-  
-    const auto r = sequence(
-        walk_up_to_door,
-	open_door,
-	close_door,
-	walk_away
-    );
-  
-    CHECK( State::Running == execute(r) );
-    CHECK( State::Fail == execute(r) );    
-  
-    CHECK( position == Position::AtDoor );
-    CHECK( door == Door::Closed );
-    CHECK( walking == false );
+  GIVEN("the dude has a key") {
+    dude_has_key = true;
+    run();
+    CHECK( true  == door_open );
+    CHECK( false == failed );
   }
-  
 }
-*/
