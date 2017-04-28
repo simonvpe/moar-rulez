@@ -45,7 +45,7 @@ SCENARIO("All rules should work independently") {
     CHECK( running == execute(running || running) );
   }
 
-  GIVEN("operator!") {
+  GIVEN("operator~") {
     CHECK( success == execute(~fail) );
     CHECK( fail    == execute(~success) );
     CHECK( running == execute(~running) );
