@@ -74,6 +74,11 @@ SCENARIO("All rules should work independently") {
     CHECK( success == execute(lt(ltvar,5)) );
     CHECK( fail    == execute(lt(ltvar,2)) );
   }
+  GIVEN("set") {
+    auto setvar = 0;
+    CHECK( success == execute(set(setvar,42)) );
+    CHECK( 42 == setvar );
+  }
 }
 
 SCENARIO("Example: A dude tries to open a door") {
