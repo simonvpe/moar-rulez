@@ -82,7 +82,6 @@ SCENARIO("All rules should work independently") {
 }
 
 SCENARIO("Example: A dude tries to open a door") {
-  // positions [ dude, door ]
   auto door_open     = false;
   auto door_locked   = true;
   auto failed        = false;
