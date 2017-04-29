@@ -6,8 +6,11 @@ The implementation is basically modeled as a behavior tree implemented with cons
 ## Getting Started ##
 
 There are no dependencies but project has only been tested with gcc 7.0.1.
+
 ## Installing ##
+
 Simply drop the `include/moar_rulez.hpp` file in your project and you're good to go.
+
 ## Example ##
 This example actually gets reduced down to a single assembler instruction if you compile it with gcc 7.0.1 and `-O3` optimization. That is indeed blazingly fast!
 ```c++
