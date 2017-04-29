@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+$(readlink -f $(dirname $0))/cibuild --clean -c Debug --test gcc-7

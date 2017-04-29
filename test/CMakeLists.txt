@@ -1,4 +1,4 @@
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g" )
+enable_testing()
 
 # Prepare "Catch" library for other executables
 set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Catch/include)
@@ -17,3 +17,5 @@ set(TEST_SOURCES
 add_executable(tests ${TEST_SOURCES})
 target_link_libraries(tests Catch)
 target_compile_features(tests PRIVATE cxx_std_17)
+
+add_test(all tests)
