@@ -70,7 +70,7 @@ the_dude_can_open_the_door():
 ```
 
 ## Running the tests ##
-Make sure you have a C++17 compiler (preferably gcc 7.0.1) and cmake >= 3.8 installed, then
+Make sure you have a C++17 compiler (preferably gcc 7.0.1) and cmake >= 3.7 installed, then
 ```
 $ git clone https://github.com/simonvpe/moar-rulez.git
 $ cd moar-rulez && mkdir build && cd build && cmake .. && make && ./test/tests
