@@ -18,6 +18,7 @@ using moar_rulez::set;
 SCENARIO("All rules should work independently") {
   
   GIVEN("constants") {
+	CHECK(false == true); // failing test
     CHECK( success == execute(success) );
     CHECK( fail	   == execute(fail) );
     CHECK( running == execute(running) );
