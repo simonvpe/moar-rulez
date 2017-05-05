@@ -112,6 +112,26 @@ SCENARIO("Complex sequences") {
   CHECK( running == execute(success && fail || running) );
   CHECK( fail    == execute(success && fail && running) );
   CHECK( fail    == execute(success && fail || fail) );
+  CHECK( running == execute(running || success && success) );
+  CHECK( running == execute(running || success && running) );
+  CHECK( running == execute(running || success || fail) );
+  CHECK( running == execute(running || success && fail) );
+  CHECK( running == execute(running && success || success) );
+  CHECK( running == execute(running && success && running) );
+  CHECK( running == execute(running && success || fail) );
+  CHECK( running == execute(running && success && fail) );
+  CHECK( running == execute(running && running || success) );
+  CHECK( running == execute(running && running && success) );
+  CHECK( running == execute(running && running || fail) );
+  CHECK( running == execute(running && running && fail) );
+  CHECK( running == execute(running || fail || success) );
+  CHECK( running == execute(running || fail && success) );
+  CHECK( running == execute(running || fail && running) );
+  CHECK( running == execute(running || fail && fail) );
+  CHECK( running == execute(running && fail || success) );
+  CHECK( running == execute(running && fail && success) );
+  CHECK( running == execute(running && fail && running) );
+  CHECK( running == execute(running && fail || fail) );
 }
 
 SCENARIO("Example: A dude tries to open a door") {
