@@ -63,35 +63,69 @@ namespace moar_rulez {
   }
 
   // Rule factories
-  
-  constexpr inline auto eq(const auto& ref, auto value) {
-    return make_rule([&ref,value]{
+  template<auto TValue>
+  constexpr inline auto eq(const auto& ref) {
+    return make_rule([&ref]{
+      return (TValue == ref) ? State::Success : State::Fail;
+    });
+  }
+	
+  constexpr inline auto eq(const auto& ref, const auto& value) {
+    return make_rule([&ref,&value]{
       return (value == ref) ? State::Success : State::Fail;
     });
   }
 
-  constexpr inline auto ne(const auto& ref, auto value) {
-    return make_rule([&ref,value]{
+  template<auto TValue>
+  constexpr inline auto ne(const auto& ref) {
+    return make_rule([&ref]{
+      return (TValue != ref) ? State::Success : State::Fail;
+    });
+  }
+	
+  constexpr inline auto ne(const auto& ref, const auto& value) {
+    return make_rule([&ref,&value]{
       return (value != ref) ? State::Success : State::Fail;
     });
   }
 
-  constexpr inline auto gt(const auto& ref, auto value) {
-    return make_rule([&ref,value]{
+  template<auto TValue>
+  constexpr inline auto gt(const auto& ref) {
+    return make_rule([&ref]{
+      return (TValue < ref) ? State::Success : State::Fail;
+    });
+  }
+	
+  constexpr inline auto gt(const auto& ref, const auto& value) {
+    return make_rule([&ref,&value]{
       return (value < ref) ? State::Success : State::Fail;
     });
   }
 
-  constexpr inline auto lt(const auto& ref, auto value) {
-    return make_rule([&ref,value]{
+  template<auto TValue>
+  constexpr inline auto lt(const auto& ref) {
+    return make_rule([&ref]{
+      return (TValue > ref) ? State::Success : State::Fail;
+    });
+  }
+  
+  constexpr inline auto lt(const auto& ref, const auto& value) {
+    return make_rule([&ref,&value]{
       return (value > ref) ? State::Success : State::Fail;
     });
   }
 
   // Manipulation of state
-
-  constexpr inline auto set(auto& ref, auto value) {
-    return make_rule([&ref,value]{
+  template<auto TValue>
+  constexpr inline auto set(auto& ref) {
+    return make_rule([&ref,&value]{
+	ref = TValue;
+	return State::Success;
+    });
+  }
+	
+  constexpr inline auto set(auto& ref, const auto& value) {
+    return make_rule([&ref,&value]{
 	ref = value;
 	return State::Success;
     });
