@@ -92,6 +92,12 @@ SCENARIO("All rules should work independently") {
   }
 }
 
+SCENARIO("Complex sequences") {
+  CHECK( success == success && fail    || success );
+  CHECK( fail    == success && fail    || fail );
+  CHECK( running == success && running || success );
+}
+
 SCENARIO("Example: A dude tries to open a door") {
   auto door_open     = false;
   auto door_locked   = true;
