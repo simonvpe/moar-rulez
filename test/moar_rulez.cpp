@@ -52,32 +52,43 @@ SCENARIO("All rules should work independently") {
   }
   
   GIVEN("eq") {
-    auto eqvar = 5;
+    const auto eqvar = 5;
     CHECK( success == execute(eq(eqvar,5)) );
-    CHECK( fail    == execute(eq(eqvar,7)) );    
+    CHECK( fail    == execute(eq(eqvar,7)) ); 
+    CHECK( success == execute(eq<5>(eqvar)) );
+    CHECK( fail    == execute(eq<7>(eqvar)) );
   }
   GIVEN("ne") {
-    auto nevar = 4;
-    CHECK( fail    == execute(ne(nevar,4)) );
+    const auto nevar = 4;
     CHECK( success == execute(ne(nevar,2)) );
-    CHECK( success == execute(~eq(nevar,2)) ); // same as above
+    CHECK( fail    == execute(ne(nevar,4)) );
+    CHECK( success == execute(ne<2>(nevar)) );
+    CHECK( fail    == execute(ne<4>(nevar)) );
   }
   GIVEN("gt") {
-    auto gtvar = 4;
+    const auto gtvar = 4;
+    CHECK( success == execute(gt(gtvar,2)) );
     CHECK( fail    == execute(gt(gtvar,4)) );
     CHECK( fail    == execute(gt(gtvar,5)) );
-    CHECK( success == execute(gt(gtvar,2)) );
+    CHECK( success == execute(gt<2>(gtvar)) );
+    CHECK( fail    == execute(gt<4>(gtvar)) );
+    CHECK( fail    == execute(gt<5>(gtvar)) );
   }
   GIVEN("lt") {
-    auto ltvar = 4;
-    CHECK( fail    == execute(lt(ltvar,4)) );
+    const auto ltvar = 4;
     CHECK( success == execute(lt(ltvar,5)) );
+    CHECK( fail    == execute(lt(ltvar,4)) );
     CHECK( fail    == execute(lt(ltvar,2)) );
+    CHECK( success == execute(lt<5>(ltvar)) );
+    CHECK( fail    == execute(lt<4>(ltvar)) );
+    CHECK( fail    == execute(lt<2>(ltvar)) );
   }
   GIVEN("set") {
     auto setvar = 0;
     CHECK( success == execute(set(setvar,42)) );
     CHECK( 42 == setvar );
+    CHECK( success == execute(set<43>(setvar)) );
+    CHECK( 43 == setvar );
   }
 }
 
