@@ -93,11 +93,25 @@ SCENARIO("All rules should work independently") {
 }
 
 SCENARIO("Complex sequences") {
-  CHECK( success == execute(success && fail    || success           ) );
-  CHECK( fail    == execute(success && fail    || fail              ) );
-  CHECK( running == execute(success && running || success           ) );
-  CHECK( fail    == execute(fail    || success && fail    || fail   ) );
-  CHECK( running == execute(fail    || success && running || success) );
+  CHECK( success == execute(success && success || running) );
+  CHECK( running == execute(success && success && running) );
+  CHECK( success == execute(success && success || fail) );
+  CHECK( success == execute(success && success && fail) );
+  CHECK( success == execute(success || running && success) );
+  CHECK( success == execute(success || running && running) );
+  CHECK( success == execute(success || running || fail) );
+  CHECK( success == execute(success || running && fail) );
+  CHECK( running == execute(success && running && success) );
+  CHECK( running == execute(success && running || running) );
+  CHECK( running == execute(success && running || fail) );
+  CHECK( success == execute(success || fail && success) );
+  CHECK( success == execute(success || fail || running) );
+  CHECK( success == execute(success || fail && running) );
+  CHECK( success == execute(success || fail && fail) );
+  CHECK( fail    == execute(success && fail && success) );
+  CHECK( fail    == execute(success && fail || running) );
+  CHECK( fail    == execute(success && fail && running) );
+  CHECK( fail    == execute(success && fail || fail) );
 }
 
 SCENARIO("Example: A dude tries to open a door") {
