@@ -132,6 +132,26 @@ SCENARIO("Complex sequences") {
   CHECK( running == execute(running && fail && success) );
   CHECK( running == execute(running && fail && running) );
   CHECK( running == execute(running && fail || fail) );
+  CHECK( success == execute(fail || success && success) );
+  CHECK( success == execute(fail || success || running) );
+  CHECK( running == execute(fail || success && running) );
+  CHECK( fail    == execute(fail || success && fail) );
+  CHECK( success == execute(fail && success || success) );
+  CHECK( running == execute(fail && success || running) );
+  CHECK( fail    == execute(fail && success && running) );
+  CHECK( fail    == execute(fail && success && fail) );
+  CHECK( running == execute(fail || running || success) );
+  CHECK( running == execute(fail || running && success) );
+  CHECK( running == execute(fail || running && running) );
+  CHECK( running == execute(fail || running && fail) );
+  CHECK( success == execute(fail && running || success) );
+  CHECK( fail    == execute(fail && running && success) );
+  CHECK( running == execute(fail && running || running) );
+  CHECK( fail    == execute(fail && running && fail) );
+  CHECK( success == execute(fail && fail || success) );
+  CHECK( fail    == execute(fail && fail && success) );
+  CHECK( running == execute(fail && fail || running) );
+  CHECK( fail    == execute(fail && fail && running) );
 }
 
 SCENARIO("Example: A dude tries to open a door") {
