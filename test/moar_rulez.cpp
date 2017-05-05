@@ -96,6 +96,7 @@ SCENARIO("Complex sequences") {
   CHECK( success == execute(success && fail    || success) );
   CHECK( fail    == execute(success && fail    || fail)    );
   CHECK( running == execute(success && running || success) );
+  CHECK( fail    == execute(fail || success && fail || fail) );
 }
 
 SCENARIO("Example: A dude tries to open a door") {
