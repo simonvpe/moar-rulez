@@ -93,10 +93,11 @@ SCENARIO("All rules should work independently") {
 }
 
 SCENARIO("Complex sequences") {
-  CHECK( success == execute(success && fail    || success) );
-  CHECK( fail    == execute(success && fail    || fail)    );
-  CHECK( running == execute(success && running || success) );
-  CHECK( fail    == execute(fail || success && fail || fail) );
+  CHECK( success == execute(success && fail    || success           ) );
+  CHECK( fail    == execute(success && fail    || fail              ) );
+  CHECK( running == execute(success && running || success           ) );
+  CHECK( fail    == execute(fail    || success && fail    || fail   ) );
+  CHECK( running == execute(fail    || success && running || success) );
 }
 
 SCENARIO("Example: A dude tries to open a door") {
