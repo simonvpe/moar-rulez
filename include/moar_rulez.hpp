@@ -118,7 +118,7 @@ namespace moar_rulez {
   // Manipulation of state
   template<auto TValue>
   constexpr inline auto set(auto& ref) {
-    return make_rule([&ref,&value]{
+    return make_rule([&ref]{
 	ref = TValue;
 	return State::Success;
     });
