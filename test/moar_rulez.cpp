@@ -96,7 +96,7 @@ SCENARIO("Complex sequences") {
   CHECK( success == execute(success && success || running) );
   CHECK( running == execute(success && success && running) );
   CHECK( success == execute(success && success || fail) );
-  CHECK( success == execute(success && success && fail) );
+  CHECK( fail    == execute(success && success && fail) );
   CHECK( success == execute(success || running && success) );
   CHECK( success == execute(success || running && running) );
   CHECK( success == execute(success || running || fail) );
@@ -109,7 +109,7 @@ SCENARIO("Complex sequences") {
   CHECK( success == execute(success || fail && running) );
   CHECK( success == execute(success || fail && fail) );
   CHECK( fail    == execute(success && fail && success) );
-  CHECK( fail    == execute(success && fail || running) );
+  CHECK( running == execute(success && fail || running) );
   CHECK( fail    == execute(success && fail && running) );
   CHECK( fail    == execute(success && fail || fail) );
 }
