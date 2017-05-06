@@ -76,7 +76,7 @@ namespace moar_rulez {
       return result == State::Fail ? State::Success :
              result == State::Success ? State::Fail :
              State::Running;
-      }, "NOT (~)");
+      }, "NOT");
   }  
 
   constexpr inline auto operator&&(Rule<auto> left, Rule<auto> right) {
@@ -86,7 +86,7 @@ namespace moar_rulez {
       const auto rresult = right.execute();
       if(rresult == State::Fail || rresult == State::Running) return rresult;
       return State::Success;
-      }, "AND (&&)");
+      }, "AND");
   }
 
   constexpr inline auto operator||(Rule<auto> left, Rule<auto> right) {
@@ -96,7 +96,7 @@ namespace moar_rulez {
       const auto rresult = right.execute();
       if(rresult == State::Success || rresult == State::Running) return rresult;
       return State::Fail;
-      }, "OR (||)");
+      }, "OR");
   }
 
   // Rule factories
@@ -104,52 +104,52 @@ namespace moar_rulez {
   constexpr inline auto eq(const auto& ref) {
     return make_rule([&ref]{
       return (TValue == ref) ? State::Success : State::Fail;
-    });
+      }, "EQ");
   }
 	
   constexpr inline auto eq(const auto& ref, const auto& value) {
     return make_rule([&ref,&value]{
       return (value == ref) ? State::Success : State::Fail;
-    });
+      }, "EQ");
   }
 
   template<auto TValue>
   constexpr inline auto ne(const auto& ref) {
     return make_rule([&ref]{
       return (TValue != ref) ? State::Success : State::Fail;
-    });
+      }, "NE");
   }
 	
   constexpr inline auto ne(const auto& ref, const auto& value) {
     return make_rule([&ref,&value]{
       return (value != ref) ? State::Success : State::Fail;
-    });
+      }, "NE");
   }
 
   template<auto TValue>
   constexpr inline auto gt(const auto& ref) {
     return make_rule([&ref]{
       return (TValue < ref) ? State::Success : State::Fail;
-    });
+      }, "GT");
   }
 	
   constexpr inline auto gt(const auto& ref, const auto& value) {
     return make_rule([&ref,&value]{
       return (value < ref) ? State::Success : State::Fail;
-    });
+      }, "GT");
   }
 
   template<auto TValue>
   constexpr inline auto lt(const auto& ref) {
     return make_rule([&ref]{
       return (TValue > ref) ? State::Success : State::Fail;
-    });
+      }, "LT");
   }
   
   constexpr inline auto lt(const auto& ref, const auto& value) {
     return make_rule([&ref,&value]{
       return (value > ref) ? State::Success : State::Fail;
-    });
+      }, "LT");
   }
 
   // Manipulation of state
@@ -158,21 +158,21 @@ namespace moar_rulez {
     return make_rule([&ref]{
 	ref = TValue;
 	return State::Success;
-    });
+      }, "SET");
   }
 	
   constexpr inline auto set(auto& ref, const auto& value) {
     return make_rule([&ref,&value]{
 	ref = value;
 	return State::Success;
-    });
+      }, "SET");
   }
   
   // Constant rules
   
-  static constexpr auto success = make_rule([]{ return State::Success; });
-  static constexpr auto fail    = make_rule([]{ return State::Fail;    });
-  static constexpr auto running = make_rule([]{ return State::Running; });
+  static constexpr auto success = make_rule([]{ return State::Success; }, "success");
+  static constexpr auto fail    = make_rule([]{ return State::Fail;    }, "fail");
+  static constexpr auto running = make_rule([]{ return State::Running; }, "running");
 
   // Convenience, makes less typing
   
