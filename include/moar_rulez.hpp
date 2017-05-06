@@ -20,6 +20,10 @@
 
 #pragma once
 
+#ifndef NDEBUG
+#  include <iostream>
+#endif
+
 namespace moar_rulez {
   enum class State { Fail, Success, Running };
 
@@ -27,12 +31,41 @@ namespace moar_rulez {
   
   template<typename TExecute> struct Rule { TExecute execute; };
 
-  constexpr inline auto make_rule(auto f) {
+
+#ifndef NDEBUG
+  static inline int indent = 0;
+  
+  constexpr inline auto make_rule_impl(auto f) {
     return Rule<decltype(f)>{f};
   }
-  
-  // Logic operators
-  
+
+  constexpr inline auto debug_wrapper(Rule<auto> rule, const char* name) {
+    return make_rule_impl([rule,name]{
+	for(auto i = 0 ; i < indent ; ++i) std::cerr << " ";
+	std::cerr << ">> Running rule " << '<' << name << "> \n";
+	++indent;
+	const auto result = rule.execute();
+	--indent;
+	for(auto i = 0 ; i < indent ; ++i) std::cerr << " ";
+	std::cerr << "<< " << (result == State::Success ? "Succes" :
+		      result == State::Fail ? "Fail" :
+		      "Running")
+		  << ' ' << name << " \n";
+	
+	return result;
+      });
+  }
+
+  constexpr inline auto make_rule(auto f, const char* name = "unknown") {
+    const auto rule = make_rule_impl(f);
+    return debug_wrapper(rule, name);
+  }
+#else
+  constexpr inline auto make_rule(auto f, const char* name = nullptr) {
+    return Rule<decltype(f)>{f};
+  }  
+#endif
+
   constexpr inline auto operator~(Rule<auto> rule) {
     return make_rule([rule]{
       const auto result = rule.execute();
@@ -40,7 +73,7 @@ namespace moar_rulez {
              result == State::Success ? State::Fail :
              State::Running;
     });
-  }
+  }  
 
   constexpr inline auto operator&&(Rule<auto> left, Rule<auto> right) {
     return make_rule([left, right]{
@@ -148,4 +181,5 @@ namespace moar_rulez {
   inline State execute(Rule<auto> rule) {
     return rule.execute();
   }
+
 } // namespace moar_rulez
