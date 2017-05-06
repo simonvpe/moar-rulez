@@ -39,7 +39,7 @@ namespace moar_rulez {
     return Rule<decltype(f)>{f};
   }
 
-  constexpr inline auto debug_wrapper(Rule<auto> rule, const char* name) {
+  constexpr inline auto debug(Rule<auto> rule, const char* name) {
     return make_rule_impl([rule,name]{
 	for(auto i = 0 ; i < indent ; ++i) std::cerr << " ";
 	std::cerr << ">> Running rule " << '<' << name << "> \n";
@@ -58,9 +58,13 @@ namespace moar_rulez {
 
   constexpr inline auto make_rule(auto f, const char* name = "unknown") {
     const auto rule = make_rule_impl(f);
-    return debug_wrapper(rule, name);
+    return debug(rule, name);
   }
 #else
+  constexpr inline auto debug(Rule<auto> rule, const char*) {
+    return rule;
+  }
+  
   constexpr inline auto make_rule(auto f, const char* name = nullptr) {
     return Rule<decltype(f)>{f};
   }  
@@ -72,7 +76,7 @@ namespace moar_rulez {
       return result == State::Fail ? State::Success :
              result == State::Success ? State::Fail :
              State::Running;
-    });
+      }, "NOT (~)");
   }  
 
   constexpr inline auto operator&&(Rule<auto> left, Rule<auto> right) {
@@ -82,7 +86,7 @@ namespace moar_rulez {
       const auto rresult = right.execute();
       if(rresult == State::Fail || rresult == State::Running) return rresult;
       return State::Success;
-    });
+      }, "AND (&&)");
   }
 
   constexpr inline auto operator||(Rule<auto> left, Rule<auto> right) {
@@ -92,7 +96,7 @@ namespace moar_rulez {
       const auto rresult = right.execute();
       if(rresult == State::Success || rresult == State::Running) return rresult;
       return State::Fail;
-    });
+      }, "OR (||)");
   }
 
   // Rule factories
