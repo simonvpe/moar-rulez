@@ -1,4 +1,4 @@
-[![Build Status](http://ec2-54-202-150-105.us-west-2.compute.amazonaws.com/api/badges/simonvpe/moar-rulez/status.svg)](http://ec2-54-202-150-105.us-west-2.compute.amazonaws.com/simonvpe/moar-rulez)
+[![Build Status](http://ec2-54-245-163-75.us-west-2.compute.amazonaws.com/api/badges/simonvpe/moar-rulez/status.svg)](http://ec2-54-202-150-105.us-west-2.compute.amazonaws.com/simonvpe/moar-rulez)
 
 # MOAR RULEZ
 Moar-rulez aims to be a very simple, very fast, yet very useful single header rules engine library. It uses operator everloads to allow chaining of rules with regular boolean operators and other helper functions.
